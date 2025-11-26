@@ -16,6 +16,22 @@ export const timezones = [
     'Pacific/Auckland',
     'Africa/Cairo',
     'America/Sao_Paulo',
+    'Africa/Johannesburg',
+    'America/Argentina/Buenos_Aires',
+    'Asia/Bangkok',
+    'Asia/Hong_Kong',
+    'Asia/Jakarta',
+    'Asia/Seoul',
+    'Asia/Singapore',
+    'Canada/Eastern',
+    'Canada/Central',
+    'Canada/Mountain',
+    'Canada/Pacific',
+    'Europe/Berlin',
+    'Europe/Helsinki',
+    'Europe/Istanbul',
+    'Europe/Madrid',
+    'Europe/Rome',
+    'Mexico/General',
+    'Pacific/Honolulu'
 ];
-
-    

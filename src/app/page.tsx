@@ -9,6 +9,7 @@ import { Settings, Globe } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { SettingsPanel } from "@/components/settings-panel";
 import { AppLogo } from "@/components/icons";
+import { getTimezoneInfo, type TimezoneInfo } from '@/lib/timezone-details';
 
 export type SettingsType = {
   locations: string[];
@@ -39,6 +40,7 @@ const defaultSettings: SettingsType = {
 export default function Home() {
   const [settings, setSettings] = useState<SettingsType>(defaultSettings);
   const [isClient, setIsClient] = useState(false);
+  const [timezoneDetails, setTimezoneDetails] = useState<Record<string, TimezoneInfo>>({});
 
   useEffect(() => {
     setIsClient(true);
@@ -65,6 +67,13 @@ export default function Home() {
     if (isClient) {
       try {
         localStorage.setItem('newYearCountdownSettings', JSON.stringify(settings));
+        
+        const details: Record<string, TimezoneInfo> = {};
+        settings.locations.forEach(loc => {
+          details[loc] = getTimezoneInfo(loc);
+        });
+        setTimezoneDetails(details);
+
       } catch (error) {
         console.error("Failed to save settings to localStorage", error);
       }
@@ -126,14 +135,21 @@ export default function Home() {
         </div>
 
         <footer className="w-full flex justify-center items-center pt-8">
-            <Tabs value={settings.currentLocation} onValueChange={handleLocationChange} className="w-full max-w-lg">
+            <Tabs value={settings.currentLocation} onValueChange={handleLocationChange} className="w-full max-w-2xl">
                 <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto">
-                    {settings.locations.slice(0, 5).map((loc) => (
-                        <TabsTrigger key={loc} value={loc} className="flex-col gap-1 py-2 text-xs h-full">
-                            <Globe className="h-4 w-4 mb-1" />
-                            <span className="truncate">{loc.split('/').pop()?.replace('_', ' ')}</span>
-                        </TabsTrigger>
-                    ))}
+                    {settings.locations.slice(0, 5).map((loc) => {
+                        const info = timezoneDetails[loc];
+                        return (
+                            <TabsTrigger key={loc} value={loc} className="flex-col gap-1 py-2 text-xs h-full">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">{info?.flag}</span>
+                                    <Globe className="h-4 w-4" />
+                                </div>
+                                <span className="truncate">{loc.split('/').pop()?.replace('_', ' ')}</span>
+                                <span className="text-muted-foreground text-[10px]">{info?.gmt}</span>
+                            </TabsTrigger>
+                        )
+                    })}
                 </TabsList>
             </Tabs>
         </footer>

@@ -12,8 +12,10 @@ import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { timezones } from "@/lib/timezones";
-import { Trash2, Palette, Image as ImageIcon, Text, Type, X, TimerOff, Building2 } from "lucide-react";
+import { getTimezoneInfo, type TimezoneInfo } from "@/lib/timezone-details";
+import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import { useState, useMemo } from "react";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 
@@ -27,6 +29,7 @@ const COMPANY_NAME_MAX_LENGTH = 30;
 
 export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleAddLocation = (newLocation: string) => {
     if (newLocation && !settings.locations.includes(newLocation)) {
@@ -39,6 +42,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         return;
       }
       setSettings(s => ({ ...s, locations: [...s.locations, newLocation] }));
+      setSearchTerm(''); // Reset search after selection
     }
   };
 
@@ -82,6 +86,12 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         });
     }
   };
+
+  const availableTimezones = useMemo(() => {
+    const filtered = timezones.filter(tz => !settings.locations.includes(tz));
+    if (!searchTerm) return filtered;
+    return filtered.filter(tz => tz.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [settings.locations, searchTerm]);
 
 
   return (
@@ -128,24 +138,55 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
           <div>
             <h3 className="text-lg font-medium mb-3">Locations</h3>
             <div className="space-y-2">
-                {settings.locations.map(loc => (
-                    <div key={loc} className="flex items-center justify-between bg-secondary p-2 rounded-md">
-                        <span className="text-sm truncate">{loc.replace('_', ' ')}</span>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleRemoveLocation(loc)}>
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                    </div>
-                ))}
+                {settings.locations.map(loc => {
+                    const info = getTimezoneInfo(loc);
+                    return (
+                        <div key={loc} className="flex items-center justify-between bg-secondary p-2 rounded-md">
+                            <div className="flex items-center gap-2 truncate">
+                                <span className="text-lg">{info.flag}</span>
+                                <div className="flex flex-col">
+                                    <span className="text-sm truncate">{loc.replace('_', ' ')}</span>
+                                    <span className="text-xs text-muted-foreground">{info.gmt}</span>
+                                </div>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => handleRemoveLocation(loc)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    );
+                })}
             </div>
-            <div className="flex gap-2 mt-3">
+             <div className="mt-3">
                 <Select onValueChange={handleAddLocation}>
                     <SelectTrigger className="flex-grow">
                         <SelectValue placeholder="Add a new location..." />
                     </SelectTrigger>
                     <SelectContent>
-                        {timezones.filter(tz => !settings.locations.includes(tz)).map(tz => (
-                            <SelectItem key={tz} value={tz}>{tz.replace('_', ' ')}</SelectItem>
-                        ))}
+                        <div className="p-2">
+                            <Input 
+                                placeholder="Search timezones..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full"
+                                onClick={(e) => e.stopPropagation()} // prevent select from closing
+                            />
+                        </div>
+                        <ScrollArea className="h-64">
+                        {availableTimezones.map(tz => {
+                            const info = getTimezoneInfo(tz);
+                            return (
+                                <SelectItem key={tz} value={tz}>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg">{info.flag}</span>
+                                        <div className="flex flex-col">
+                                            <span>{tz.replace('_', ' ')}</span>
+                                            <span className="text-xs text-muted-foreground">{info.gmt}</span>
+                                        </div>
+                                    </div>
+                                </SelectItem>
+                            )
+                        })}
+                        </ScrollArea>
                     </SelectContent>
                 </Select>
             </div>
