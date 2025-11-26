@@ -12,7 +12,7 @@ import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { timezones } from "@/lib/timezones";
-import { Trash2, Palette, Image as ImageIcon, Text, Type, X, TimerOff } from "lucide-react";
+import { Trash2, Palette, Image as ImageIcon, Text, Type, X, TimerOff, Building2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
@@ -23,6 +23,7 @@ interface SettingsPanelProps {
 }
 
 const colorSwatches = ['#D4A274', '#C0C0C0', '#FFFFFF', '#FFD700', '#87CEEB'];
+const COMPANY_NAME_MAX_LENGTH = 30;
 
 export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
   const { toast } = useToast();
@@ -57,7 +58,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
     });
   };
 
-  const handleWallpaperUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (field: 'wallpaper' | 'companyLogo') => (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && (file.type === 'image/png' || file.type === 'image/jpeg')) {
         if (file.size > 5 * 1024 * 1024) { // 5MB limit
@@ -70,7 +71,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSettings(s => ({ ...s, wallpaper: reader.result as string }));
+        setSettings(s => ({ ...s, [field]: reader.result as string }));
       };
       reader.readAsDataURL(file);
     } else {
@@ -82,6 +83,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
     }
   };
 
+
   return (
     <>
       <SheetHeader>
@@ -91,6 +93,37 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
       <Separator className="my-4" />
       <ScrollArea className="h-[calc(100%-80px)] pr-4">
         <div className="space-y-6">
+
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Building2 className="h-5 w-5"/> Branding</h3>
+            <div className="space-y-4">
+              <div>
+                <Label>Company Name</Label>
+                 <Input
+                    value={settings.companyName}
+                    onChange={(e) => {
+                        if (e.target.value.length <= COMPANY_NAME_MAX_LENGTH) {
+                            setSettings(s => ({...s, companyName: e.target.value}));
+                        }
+                    }}
+                    placeholder="Your Company Name"
+                    maxLength={COMPANY_NAME_MAX_LENGTH}
+                 />
+                 <p className="text-xs text-muted-foreground mt-1">{settings.companyName.length} / {COMPANY_NAME_MAX_LENGTH}</p>
+              </div>
+              <div>
+                <Label htmlFor="logo-upload">Company Logo</Label>
+                <Input id="logo-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('companyLogo')} />
+                 {settings.companyLogo && (
+                     <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => setSettings(s => ({...s, companyLogo: null}))}>
+                        <X className="mr-2 h-4 w-4"/> Remove Logo
+                    </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <Separator />
           
           <div>
             <h3 className="text-lg font-medium mb-3">Locations</h3>
@@ -204,7 +237,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                 <Label htmlFor="wallpaper-upload" className="block cursor-pointer text-center p-4 border-2 border-dashed rounded-lg hover:bg-accent">
                     Click to upload a PNG/JPG
                 </Label>
-                <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleWallpaperUpload} />
+                <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleImageUpload('wallpaper')} />
                 {settings.wallpaper && (
                      <Button variant="outline" className="w-full" onClick={() => setSettings(s => ({...s, wallpaper: null}))}>
                         <X className="mr-2 h-4 w-4"/> Remove Wallpaper

@@ -19,6 +19,8 @@ export type SettingsType = {
   fontSize: number;
   title: string;
   stopOnZero: boolean;
+  companyName: string;
+  companyLogo: string | null;
 };
 
 const defaultSettings: SettingsType = {
@@ -30,6 +32,8 @@ const defaultSettings: SettingsType = {
   fontSize: 96,
   title: 'Until the New Year',
   stopOnZero: true,
+  companyName: 'Global Countdown',
+  companyLogo: null,
 };
 
 export default function Home() {
@@ -89,8 +93,12 @@ export default function Home() {
       >
         <header className="w-full flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <AppLogo className="h-8 w-8 text-primary" />
-            <h1 className="text-xl font-headline tracking-wider hidden sm:block">Global Countdown</h1>
+            {settings.companyLogo ? (
+              <img src={settings.companyLogo} alt="Company Logo" className="h-8 w-auto" />
+            ) : (
+              <AppLogo className="h-8 w-8 text-primary" />
+            )}
+            <h1 className="text-xl font-headline tracking-wider hidden sm:block">{settings.companyName}</h1>
           </div>
           <Sheet>
             <SheetTrigger asChild>
