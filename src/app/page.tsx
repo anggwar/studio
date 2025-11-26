@@ -217,8 +217,8 @@ export default function Home() {
                         <Image src={detail.flag} alt={`${location} flag`} width={30} height={20} className="rounded-sm" />
                       )}
                       <div className="text-left">
-                         <p className={cn("text-sm font-medium", settings.fontClass)} style={{color: settings.fontColor}}>{location.split('/')[1]?.replace('_', ' ')}</p>
-                         <p className="text-xs" style={{color: settings.fontColor, opacity: 0.8}}>{detail?.gmt}</p>
+                         <p className={cn("text-sm font-medium", settings.fontClass)} style={{color: settings.fontColor, opacity: index === current ? 1 : 0.8}}>{location.split('/')[1]?.replace('_', ' ')}</p>
+                         <p className="text-xs" style={{color: settings.fontColor, opacity: index === current ? 0.8 : 0.6}}>{detail?.gmt}</p>
                       </div>
                     </button>
                   )
