@@ -49,7 +49,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [timezoneDetails, setTimezoneDetails] = useState<Record<string, TimezoneInfo>>({});
   
-  const backgroundImage = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
+  const backgroundImageStyle = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
 
   useEffect(() => {
     setIsClient(true);
@@ -107,16 +107,10 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-background overflow-hidden">
-        {backgroundImage && (
-            <Image
-                key={backgroundImage}
-                src={backgroundImage}
-                alt="Background wallpaper"
-                fill
-                priority
-                className="object-cover transition-all duration-500"
-            />
-        )}
+      <div 
+          className="absolute inset-0 transition-all duration-1000 bg-cover bg-center"
+          style={backgroundImageStyle}
+      />
       <div className="stars"></div>
       <div className="twinkling"></div>
       <main 

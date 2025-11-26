@@ -8,15 +8,16 @@ export function useWallpaper(
   wallpaperType: 'default' | 'custom',
   customWallpaperUrl: string | null,
   currentLocation: string
-): string {
+): React.CSSProperties {
   const backgroundImageUrl = useMemo(() => {
     if (wallpaperType === 'custom' && customWallpaperUrl) {
-      return customWallpaperUrl;
+      return `url(${customWallpaperUrl})`;
     } 
     
-    return defaultImages[currentLocation] || defaultImages['default'] || '';
+    const defaultUrl = defaultImages[currentLocation] || defaultImages['default'] || '';
+    return `url(${defaultUrl})`;
 
   }, [wallpaperType, customWallpaperUrl, currentLocation]);
 
-  return backgroundImageUrl;
+  return { backgroundImage: backgroundImageUrl };
 }
