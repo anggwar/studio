@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -10,9 +11,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['Lora', 'serif'],
+        headline: ['Oswald', 'sans-serif'],
         code: ['monospace'],
+        roboto: ['Roboto', 'sans-serif'],
+        'playfair-display': ['"Playfair Display"', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -97,3 +100,5 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
+    

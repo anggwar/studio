@@ -1,80 +1,30 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 240 27% 21%;
+    --foreground: 30 30% 95%;
+    --card: 240 27% 25%;
+    --card-foreground: 30 30% 95%;
+    --popover: 240 27% 23%;
+    --popover-foreground: 30 30% 95%;
+    --primary: 30 48% 64%;
+    --primary-foreground: 240 27% 15%;
+    --secondary: 240 27% 30%;
+    --secondary-foreground: 30 30% 95%;
+    --muted: 240 27% 30%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 27% 30%;
+    --accent-foreground: 30 30% 95%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 240 27% 30%;
+    --input: 240 27% 30%;
+    --ring: 30 48% 70%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -86,3 +36,34 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .stars {
+    background:#000 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAHhJREFUWEft1TEKACAQBEE/S/e/hB7EoU1cTxUkkQ/s/yQl5wRAb0y7i+q4iYxG0A2E2FbmjQJ0A+E2FbalS5c+fMDBfQ9hNhVvS4dugHwmwqs0WEXYK4VYVdaVER3pE2E2F32AI/QBYTYXNYBAg/gAAds0bBAAAAAASUVORK5CYII=) repeat top center;
+    z-index: 0;
+  }
+  
+  @keyframes move-twink-back {
+      from {background-position:0 0;}
+      to {background-position:-10000px 5000px;}
+  }
+
+  .twinkling {
+    animation:move-twink-back 200s linear infinite;
+    background:transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAYlJREFUWEfF10tSAyEUAMAP9+jN9R5e13sPb28/40jw2UaJGmQ1jplJ0v6k+4cOEUIIIYQQQogXQhjj/XowC/UBCSGeiJ+0gNk0wB1Axy3H2uRYQUJIt5B3hWBFHAYkAYdWdC/g8e14WwmYhL4hPZaBwUxoA01gA2+B3wAHeA+sgAcsAr/f8wBOU3wAnECyA/oA/p4nAYrJg/sAYfN/3/cBXqP5AbqA4Q80kK8iADhDswvUAVmKB7gE3gJD1Ac2IcLX+wX8VnAXbEefrBIDFGGvARZAz/UCDIAa8AM2AY/AOfAEvAFp0eD/PAaQAMaACRAJ5O31+3kLkK984CgAN+B3Q9M1AD4EHpW8X8Lfs/An8BDYAj6BL4Av4JXAFrgA5wDNpYqgSnAGPpb/N1wB84A04R2QBc4AueF/CngFngVfAWvALfADnAGXwBPwFtgBHYA3YA84BN4AOwAfaEa2A42Aq2A3eA+WAF2gHegFfqu4AV6A/wBPQC0x6A9wA/wAJgGfqu4APQC3wBPwB3QC7wAawA20A28AOYBvaARuAtcBpoBtYB2wDZwDWwAswD2wDWwF2wEWkAgAAAAASUVORK5CYII=) repeat top center;
+    z-index: 1;
+  }
+}
+
+    
