@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { Fragment } from 'react';
 
 interface CountdownProps {
   location: string;
@@ -10,6 +11,7 @@ interface CountdownProps {
   fontSize: number;
   title: string;
   stopOnZero: boolean;
+  isMultiView?: boolean;
 }
 
 const calculateTimeRemaining = (location: string) => {
@@ -54,7 +56,7 @@ const calculateTimeRemaining = (location: string) => {
 };
 
 
-export function Countdown({ location, fontClassName, fontColor, fontSize, title, stopOnZero }: CountdownProps) {
+export function Countdown({ location, fontClassName, fontColor, fontSize, title, stopOnZero, isMultiView = false }: CountdownProps) {
   const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining(location));
   const [isNewYear, setIsNewYear] = useState(false);
 
@@ -102,19 +104,30 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
   return (
     <div className="flex flex-col items-center bg-black/20 p-4 md:p-6 rounded-lg backdrop-blur-sm w-full">
         {title && <h2 className="text-xl sm:text-2xl md:text-3xl font-body mb-2 md:mb-4" style={{ color: fontColor }}>{title}</h2>}
-        <div className="flex justify-center gap-2 sm:gap-4">
-            {timeUnits.map((unit) => (
-            <div key={unit.label} className="flex flex-col items-center">
-                <div 
-                    className={`font-bold tracking-tighter ${fontClassName}`}
-                    style={{ color: fontColor, fontSize: `${fontSize}px`, lineHeight: 1 }}
-                >
-                    {String(unit.value).padStart(2, '0')}
-                </div>
-                <div className="text-xs sm:text-sm text-foreground/70 font-body uppercase tracking-widest mt-1">
-                    {unit.label}
-                </div>
-            </div>
+        <div className="flex justify-center items-center gap-1 sm:gap-2">
+            {timeUnits.map((unit, index) => (
+                <Fragment key={unit.label}>
+                    <div className="flex flex-col items-center px-1">
+                        <div 
+                            className={`font-bold tracking-tighter ${fontClassName}`}
+                            style={{ color: fontColor, fontSize: `${fontSize}px`, lineHeight: 1 }}
+                        >
+                            {String(unit.value).padStart(2, '0')}
+                        </div>
+                        <div className="text-xs sm:text-sm text-foreground/70 font-body uppercase tracking-widest mt-1">
+                            {unit.label}
+                        </div>
+                    </div>
+                    {!isMultiView && index < timeUnits.length - 1 && (
+                        <div 
+                            className={`font-bold -mt-4 sm:-mt-5 ${fontClassName}`}
+                            style={{ color: fontColor, fontSize: `${fontSize * 0.8}px` }}
+                            aria-hidden="true"
+                        >
+                            :
+                        </div>
+                    )}
+                </Fragment>
             ))}
         </div>
         {isNewYear && !stopOnZero && (

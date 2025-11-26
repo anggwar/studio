@@ -144,6 +144,7 @@ export default function Home() {
                             fontSize={multiViewFontSize}
                             title={loc.split('/').pop()?.replace('_', ' ') || ''}
                             stopOnZero={settings.stopOnZero}
+                            isMultiView={true}
                         />
                     ))}
                 </div>
