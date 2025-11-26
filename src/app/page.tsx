@@ -19,7 +19,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel"
-import { Sheet } from '@/components/ui/sheet';
 
 export type SettingsType = {
   fontClass: string;
@@ -73,7 +72,11 @@ export default function Home() {
   useEffect(() => {
     if (isClient) {
       try {
-        localStorage.setItem('countdownSettings', JSON.stringify(settings));
+        // Create a copy of settings and remove image data before saving
+        const settingsToStore = { ...settings };
+        delete (settingsToStore as Partial<SettingsType>).wallpaper;
+        delete (settingsToStore as Partial<SettingsType>).companyLogo;
+        localStorage.setItem('countdownSettings', JSON.stringify(settingsToStore));
       } catch (error) {
         console.error("Failed to save settings to localStorage", error);
       }
@@ -214,8 +217,8 @@ export default function Home() {
                         <Image src={detail.flag} alt={`${location} flag`} width={30} height={20} className="rounded-sm" />
                       )}
                       <div className="text-left">
-                         <p className={cn("text-sm font-medium", settings.fontClass)} style={{color: '#FFFFFF'}}>{location.split('/')[1]?.replace('_', ' ')}</p>
-                         <p className="text-xs text-white/80">{detail?.gmt}</p>
+                         <p className={cn("text-sm font-medium", settings.fontClass)} style={{color: settings.fontColor}}>{location.split('/')[1]?.replace('_', ' ')}</p>
+                         <p className="text-xs" style={{color: settings.fontColor, opacity: 0.8}}>{detail?.gmt}</p>
                       </div>
                     </button>
                   )
@@ -234,5 +237,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
