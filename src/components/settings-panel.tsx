@@ -12,7 +12,7 @@ import { Sheet, SheetHeader, SheetTitle, SheetDescription, SheetContent } from "
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { getTimezoneInfo } from "@/lib/timezone-details";
-import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2, LayoutGrid, Layout } from "lucide-react";
+import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2, LayoutGrid, Layout, Upload } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useMemo } from "react";
 import { Slider } from "./ui/slider";
@@ -88,6 +88,8 @@ export function SettingsPanel({ isOpen, onClose, settings, onSettingsChange, all
             description: "Please upload a PNG or JPG image.",
         });
     }
+    // Reset file input
+    event.target.value = '';
   };
 
   const availableTimezones = useMemo(() => {
@@ -126,12 +128,19 @@ export function SettingsPanel({ isOpen, onClose, settings, onSettingsChange, all
                         <p className="text-xs text-muted-foreground mt-1">{settings.companyName.length} / {COMPANY_NAME_MAX_LENGTH}</p>
                     </div>
                     <div>
-                        <Label htmlFor="logo-upload">Company Logo</Label>
-                        <Input id="logo-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('companyLogo')} />
+                        <Label>Company Logo</Label>
+                        <Label htmlFor="logo-upload" className="mt-1 group flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                            <Upload className="mr-2 h-4 w-4" />
+                            <span>Upload Logo</span>
+                        </Label>
+                        <Input id="logo-upload" type="file" accept="image/png, image/jpeg" className="sr-only" onChange={handleImageUpload('companyLogo')} />
                         {settings.companyLogo && (
-                            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => onSettingsChange(s => ({...s, companyLogo: null}))}>
-                                <X className="mr-2 h-4 w-4"/> Remove Logo
-                            </Button>
+                             <div className="mt-2 relative w-fit mx-auto">
+                                <Image src={settings.companyLogo} alt="Company Logo Preview" width={80} height={80} className="rounded-md object-contain border bg-secondary" />
+                                <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => onSettingsChange(s => ({...s, companyLogo: null}))}>
+                                    <X className="h-4 w-4"/>
+                                </Button>
+                            </div>
                         )}
                     </div>
                     </div>
@@ -309,11 +318,19 @@ export function SettingsPanel({ isOpen, onClose, settings, onSettingsChange, all
                 <div>
                     <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><ImageIcon className="h-5 w-5"/> Wallpaper</h3>
                     <div className="space-y-3">
-                        <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('wallpaper')} />
+                        <Label htmlFor="wallpaper-upload" className="group flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                           <Upload className="mr-2 h-4 w-4" />
+                           <span>Upload Wallpaper</span>
+                        </Label>
+                        <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="sr-only" onChange={handleImageUpload('wallpaper')} />
+
                         {settings.wallpaper && (
-                            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => onSettingsChange(s => ({...s, wallpaper: null}))}>
-                                <X className="mr-2 h-4 w-4"/> Remove Wallpaper
-                            </Button>
+                            <div className="mt-2 relative w-fit mx-auto">
+                                <Image src={settings.wallpaper} alt="Wallpaper Preview" width={160} height={90} className="rounded-md object-cover border bg-secondary" />
+                                <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => onSettingsChange(s => ({...s, wallpaper: null}))}>
+                                    <X className="h-4 w-4"/>
+                                </Button>
+                            </div>
                         )}
                     </div>
                 </div>
