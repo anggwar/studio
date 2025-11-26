@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 
 interface CountdownProps {
   location: string;
@@ -24,12 +23,6 @@ const calculateTimeRemaining = (location: string) => {
     // Create a string for the target date and time.
     // Important: Don't let JS parse this directly as it will use the browser's timezone.
     const targetDateString = `${nextYear}-01-01T00:00:00`;
-
-    // Get the target date interpreted in the target timezone
-    const targetDate = new Date(new Date(targetDateString).toLocaleString("en-US", { timeZone: location }));
-    const targetTimeInTargetZone = new Date(
-      targetDate.toLocaleString('en-US', { timeZone: 'UTC' })
-    );
 
     // Get the current date interpreted in the target timezone.
     const currentTimeInTargetZone = new Date(
@@ -67,6 +60,9 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
         setIsNewYear(true);
         if (!stopOnZero) {
           setTimeRemaining(remaining);
+        } else {
+          // Ensure timer stops at zero when stopOnZero is true
+          setTimeRemaining({ total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 });
         }
       } else {
         setIsNewYear(false);
@@ -87,12 +83,12 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tighter animate-pulse">
                 Happy New Year!
             </h2>
-            <p className="text-lg sm:text-xl mt-2 font-body">{location.replace('_', ' ')}</p>
+            <p className="text-lg sm:text-xl mt-2 font-body">{location.replace(/_/g, ' ')}</p>
         </div>
     );
   }
 
-  const timeToShow = isNewYear ? { days: 0, hours: 0, minutes: 0, seconds: 0 } : timeRemaining;
+  const timeToShow = timeRemaining;
 
   const timeUnits = [
     { label: 'Days', value: timeToShow.days },
@@ -138,3 +134,5 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
     </div>
   );
 }
+
+    

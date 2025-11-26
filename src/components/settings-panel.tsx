@@ -8,11 +8,10 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetHeader, SheetTitle, SheetDescription, SheetContent } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
-import { timezones } from "@/lib/timezones";
-import { getTimezoneInfo, type TimezoneInfo } from "@/lib/timezone-details";
+import { getTimezoneInfo } from "@/lib/timezone-details";
 import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2, LayoutGrid, Layout } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useMemo } from "react";
@@ -22,14 +21,17 @@ import Image from "next/image";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 interface SettingsPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
   settings: SettingsType;
-  setSettings: Dispatch<SetStateAction<SettingsType>>;
+  onSettingsChange: Dispatch<SetStateAction<SettingsType>>;
+  allTimezones: string[];
 }
 
 const colorSwatches = ['#D4A274', '#C0C0C0', '#FFFFFF', '#FFD700', '#87CEEB'];
 const COMPANY_NAME_MAX_LENGTH = 30;
 
-export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
+export function SettingsPanel({ isOpen, onClose, settings, onSettingsChange, allTimezones }: SettingsPanelProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -43,7 +45,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         });
         return;
       }
-      setSettings(s => ({ ...s, locations: [...s.locations, newLocation] }));
+      onSettingsChange(s => ({ ...s, locations: [...s.locations, newLocation] }));
       setSearchTerm(''); // Reset search after selection
     }
   };
@@ -57,10 +59,9 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         });
         return;
     }
-    setSettings(s => {
+    onSettingsChange(s => {
         const newLocations = s.locations.filter(loc => loc !== locationToRemove);
-        const newCurrentLocation = s.currentLocation === locationToRemove ? newLocations[0] : s.currentLocation;
-        return { ...s, locations: newLocations, currentLocation: newCurrentLocation };
+        return { ...s, locations: newLocations };
     });
   };
 
@@ -77,7 +78,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSettings(s => ({ ...s, [field]: reader.result as string }));
+        onSettingsChange(s => ({ ...s, [field]: reader.result as string }));
       };
       reader.readAsDataURL(file);
     } else {
@@ -90,234 +91,238 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
   };
 
   const availableTimezones = useMemo(() => {
-    const filtered = timezones.filter(tz => !settings.locations.includes(tz));
+    const filtered = allTimezones.filter(tz => !settings.locations.includes(tz));
     if (!searchTerm) return filtered;
     return filtered.filter(tz => tz.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [settings.locations, searchTerm]);
+  }, [settings.locations, searchTerm, allTimezones]);
 
 
   return (
-    <>
-      <SheetHeader>
-        <SheetTitle>Settings</SheetTitle>
-        <SheetDescription>Customize your countdown experience.</SheetDescription>
-      </SheetHeader>
-      <Separator className="my-4" />
-      <ScrollArea className="h-[calc(100%-80px)] pr-4">
-        <div className="space-y-6">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent className="w-[320px] sm:w-[400px] bg-background/95 backdrop-blur-sm">
+            <SheetHeader>
+                <SheetTitle>Settings</SheetTitle>
+                <SheetDescription>Customize your countdown experience.</SheetDescription>
+            </SheetHeader>
+            <Separator className="my-4" />
+            <ScrollArea className="h-[calc(100%-80px)] pr-4">
+                <div className="space-y-6">
 
-          <div>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Building2 className="h-5 w-5"/> Branding</h3>
-            <div className="space-y-4">
-              <div>
-                <Label>Company Name</Label>
-                 <Input
-                    value={settings.companyName}
-                    onChange={(e) => {
-                        if (e.target.value.length <= COMPANY_NAME_MAX_LENGTH) {
-                            setSettings(s => ({...s, companyName: e.target.value}));
-                        }
-                    }}
-                    placeholder="Your Company Name"
-                    maxLength={COMPANY_NAME_MAX_LENGTH}
-                 />
-                 <p className="text-xs text-muted-foreground mt-1">{settings.companyName.length} / {COMPANY_NAME_MAX_LENGTH}</p>
-              </div>
-              <div>
-                <Label htmlFor="logo-upload">Company Logo</Label>
-                <Input id="logo-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('companyLogo')} />
-                 {settings.companyLogo && (
-                     <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => setSettings(s => ({...s, companyLogo: null}))}>
-                        <X className="mr-2 h-4 w-4"/> Remove Logo
-                    </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div>
-             <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Layout className="h-5 w-5"/> Display Mode</h3>
-             <RadioGroup
-                value={settings.displayMode}
-                onValueChange={(value: 'single' | 'multi') => setSettings(s => ({...s, displayMode: value}))}
-                className="grid grid-cols-2 gap-4"
-              >
-                  <div>
-                    <RadioGroupItem value="single" id="single" className="peer sr-only" />
-                    <Label htmlFor="single" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                       <Layout className="mb-3 h-6 w-6" />
-                       Single View
-                    </Label>
-                  </div>
-
-                  <div>
-                    <RadioGroupItem value="multi" id="multi" className="peer sr-only" />
-                    <Label htmlFor="multi" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                      <LayoutGrid className="mb-3 h-6 w-6" />
-                      Multi View
-                    </Label>
-                  </div>
-             </RadioGroup>
-          </div>
-          
-          <Separator />
-          
-          <div>
-            <h3 className="text-lg font-medium mb-3">Locations</h3>
-            <div className="space-y-2">
-                {settings.locations.map(loc => {
-                    const info = getTimezoneInfo(loc);
-                    return (
-                        <div key={loc} className="flex items-center justify-between bg-secondary p-2 rounded-md">
-                            <div className="flex items-center gap-2 truncate">
-                                {info.flag && <Image src={info.flag} alt="" width={20} height={15} className="rounded-sm" />}
-                                <div className="flex flex-col">
-                                    <span className="text-sm truncate">{loc.replace('_', ' ')}</span>
-                                    <span className="text-xs text-muted-foreground">{info.gmt}</span>
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => handleRemoveLocation(loc)}>
-                                <Trash2 className="h-4 w-4" />
+                <div>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Building2 className="h-5 w-5"/> Branding</h3>
+                    <div className="space-y-4">
+                    <div>
+                        <Label>Company Name</Label>
+                        <Input
+                            value={settings.companyName}
+                            onChange={(e) => {
+                                if (e.target.value.length <= COMPANY_NAME_MAX_LENGTH) {
+                                    onSettingsChange(s => ({...s, companyName: e.target.value}));
+                                }
+                            }}
+                            placeholder="Your Company Name"
+                            maxLength={COMPANY_NAME_MAX_LENGTH}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">{settings.companyName.length} / {COMPANY_NAME_MAX_LENGTH}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="logo-upload">Company Logo</Label>
+                        <Input id="logo-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('companyLogo')} />
+                        {settings.companyLogo && (
+                            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => onSettingsChange(s => ({...s, companyLogo: null}))}>
+                                <X className="mr-2 h-4 w-4"/> Remove Logo
                             </Button>
+                        )}
+                    </div>
+                    </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Layout className="h-5 w-5"/> Display Mode</h3>
+                    <RadioGroup
+                        value={settings.displayMode}
+                        onValueChange={(value: 'single' | 'multi') => onSettingsChange(s => ({...s, displayMode: value}))}
+                        className="grid grid-cols-2 gap-4"
+                    >
+                        <div>
+                            <RadioGroupItem value="single" id="single" className="peer sr-only" />
+                            <Label htmlFor="single" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                            <Layout className="mb-3 h-6 w-6" />
+                            Single View
+                            </Label>
                         </div>
-                    );
-                })}
-            </div>
-             <div className="mt-3">
-                <Select onValueChange={handleAddLocation}>
-                    <SelectTrigger className="flex-grow">
-                        <SelectValue placeholder="Add a new location..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <div className="p-2">
-                            <Input 
-                                placeholder="Search timezones..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full"
-                                onClick={(e) => e.stopPropagation()} // prevent select from closing
-                            />
+
+                        <div>
+                            <RadioGroupItem value="multi" id="multi" className="peer sr-only" />
+                            <Label htmlFor="multi" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                            <LayoutGrid className="mb-3 h-6 w-6" />
+                            Multi View
+                            </Label>
                         </div>
-                        <ScrollArea className="h-64">
-                        {availableTimezones.map(tz => {
-                            const info = getTimezoneInfo(tz);
+                    </RadioGroup>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                    <h3 className="text-lg font-medium mb-3">Locations</h3>
+                    <div className="space-y-2">
+                        {settings.locations.map(loc => {
+                            const info = getTimezoneInfo(loc);
                             return (
-                                <SelectItem key={tz} value={tz}>
-                                    <div className="flex items-center gap-2">
+                                <div key={loc} className="flex items-center justify-between bg-secondary p-2 rounded-md">
+                                    <div className="flex items-center gap-2 truncate">
                                         {info.flag && <Image src={info.flag} alt="" width={20} height={15} className="rounded-sm" />}
                                         <div className="flex flex-col">
-                                            <span>{tz.replace('_', ' ')}</span>
+                                            <span className="text-sm truncate">{loc.replace(/_/g, ' ')}</span>
                                             <span className="text-xs text-muted-foreground">{info.gmt}</span>
                                         </div>
                                     </div>
-                                </SelectItem>
-                            )
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => handleRemoveLocation(loc)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            );
                         })}
-                        </ScrollArea>
-                    </SelectContent>
-                </Select>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          <div className={settings.displayMode === 'multi' ? 'opacity-50 pointer-events-none' : ''}>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Text className="h-5 w-5"/> Title</h3>
-             <Input
-                value={settings.title}
-                onChange={(e) => setSettings(s => ({...s, title: e.target.value}))}
-                placeholder="Countdown Title"
-                disabled={settings.displayMode === 'multi'}
-             />
-             {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Custom title is disabled in Multi View</p>}
-          </div>
+                    </div>
+                    <div className="mt-3">
+                        <Select onValueChange={handleAddLocation}>
+                            <SelectTrigger className="flex-grow">
+                                <SelectValue placeholder="Add a new location..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <div className="p-2">
+                                    <Input 
+                                        placeholder="Search timezones..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full"
+                                        onClick={(e) => e.stopPropagation()} // prevent select from closing
+                                    />
+                                </div>
+                                <ScrollArea className="h-64">
+                                {availableTimezones.map(tz => {
+                                    const info = getTimezoneInfo(tz);
+                                    return (
+                                        <SelectItem key={tz} value={tz}>
+                                            <div className="flex items-center gap-2">
+                                                {info.flag && <Image src={info.flag} alt="" width={20} height={15} className="rounded-sm" />}
+                                                <div className="flex flex-col">
+                                                    <span>{tz.replace(/_/g, ' ')}</span>
+                                                    <span className="text-xs text-muted-foreground">{info.gmt}</span>
+                                                </div>
+                                            </div>
+                                        </SelectItem>
+                                    )
+                                })}
+                                </ScrollArea>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                
+                <Separator />
+                
+                <div className={settings.displayMode === 'multi' ? 'opacity-50 pointer-events-none' : ''}>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Text className="h-5 w-5"/> Title</h3>
+                    <Input
+                        value={settings.title}
+                        onChange={(e) => onSettingsChange(s => ({...s, title: e.target.value}))}
+                        placeholder="Countdown Title"
+                        disabled={settings.displayMode === 'multi'}
+                    />
+                    {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Custom title is disabled in Multi View</p>}
+                </div>
 
-          <Separator />
+                <Separator />
 
-          <div>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Palette className="h-5 w-5"/> Appearance</h3>
-            <div className="space-y-4">
-              <div>
-                <Label>Font Style</Label>
-                <Select value={settings.fontClass} onValueChange={(value) => setSettings(s => ({...s, fontClass: value}))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a font" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fonts.map(font => (
-                      <SelectItem key={font.name} value={font.className}>{font.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                 <div className="flex justify-between items-center">
-                    <Label>Font Size</Label>
-                    <span className="text-sm text-muted-foreground">{settings.fontSize}px</span>
-                 </div>
-                 <Slider
-                    value={[settings.fontSize]}
-                    onValueChange={(value) => setSettings(s => ({ ...s, fontSize: value[0] }))}
-                    min={24}
-                    max={200}
-                    step={1}
-                    className="mt-2"
-                />
-                 {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Font size is auto-adjusted in Multi View</p>}
-              </div>
-              <div>
-                <Label>Font Color</Label>
-                <div className="flex gap-2 mt-2">
-                    {colorSwatches.map(color => (
-                        <button 
-                            key={color} 
-                            onClick={() => setSettings(s => ({...s, fontColor: color}))}
-                            className="h-8 w-8 rounded-full border-2 transition-all"
-                            style={{ backgroundColor: color, borderColor: settings.fontColor === color ? 'hsl(var(--ring))' : 'transparent' }}
+                <div>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Palette className="h-5 w-5"/> Appearance</h3>
+                    <div className="space-y-4">
+                    <div>
+                        <Label>Font Style</Label>
+                        <Select value={settings.fontClass} onValueChange={(value) => onSettingsChange(s => ({...s, fontClass: value}))}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a font" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {fonts.map(font => (
+                            <SelectItem key={font.name} value={font.className}>{font.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <Label>Font Size</Label>
+                            <span className="text-sm text-muted-foreground">{settings.fontSize}px</span>
+                        </div>
+                        <Slider
+                            value={[settings.fontSize]}
+                            onValueChange={(value) => onSettingsChange(s => ({ ...s, fontSize: value[0] }))}
+                            min={24}
+                            max={200}
+                            step={1}
+                            className="mt-2"
                         />
-                    ))}
-                    <Input type="color" value={settings.fontColor} onChange={(e) => setSettings(s => ({...s, fontColor: e.target.value}))} className="h-8 w-10 p-1"/>
+                        {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Font size is auto-adjusted in Multi View</p>}
+                    </div>
+                    <div>
+                        <Label>Font Color</Label>
+                        <div className="flex gap-2 mt-2">
+                            {colorSwatches.map(color => (
+                                <button 
+                                    key={color} 
+                                    onClick={() => onSettingsChange(s => ({...s, fontColor: color}))}
+                                    className="h-8 w-8 rounded-full border-2 transition-all"
+                                    style={{ backgroundColor: color, borderColor: settings.fontColor === color ? 'hsl(var(--ring))' : 'transparent' }}
+                                />
+                            ))}
+                            <Input type="color" value={settings.fontColor} onChange={(e) => onSettingsChange(s => ({...s, fontColor: e.target.value}))} className="h-8 w-10 p-1"/>
+                        </div>
+                    </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          <Separator />
+                <Separator />
 
-          <div>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><TimerOff className="h-5 w-5"/> Behavior</h3>
-            <div className="flex items-center justify-between rounded-lg border p-3">
-                <div className="space-y-0.5">
-                    <Label>Stop timer on New Year</Label>
-                    <p className="text-xs text-muted-foreground">
-                        Show "Happy New Year" instead of counting up.
-                    </p>
+                <div>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><TimerOff className="h-5 w-5"/> Behavior</h3>
+                    <div className="flex items-center justify-between rounded-lg border p-3">
+                        <div className="space-y-0.5">
+                            <Label>Stop timer on New Year</Label>
+                            <p className="text-xs text-muted-foreground">
+                                Show "Happy New Year" instead of counting up.
+                            </p>
+                        </div>
+                        <Switch
+                            checked={settings.stopOnZero}
+                            onCheckedChange={(checked) => onSettingsChange(s => ({...s, stopOnZero: checked}))}
+                        />
+                    </div>
                 </div>
-                <Switch
-                    checked={settings.stopOnZero}
-                    onCheckedChange={(checked) => setSettings(s => ({...s, stopOnZero: checked}))}
-                />
-            </div>
-          </div>
 
-          <Separator />
-          
-          <div>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><ImageIcon className="h-5 w-5"/> Wallpaper</h3>
-            <div className="space-y-3">
-                <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('wallpaper')} />
-                {settings.wallpaper && (
-                    <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => setSettings(s => ({...s, wallpaper: null}))}>
-                        <X className="mr-2 h-4 w-4"/> Remove Wallpaper
-                    </Button>
-                )}
-            </div>
-          </div>
+                <Separator />
+                
+                <div>
+                    <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><ImageIcon className="h-5 w-5"/> Wallpaper</h3>
+                    <div className="space-y-3">
+                        <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="mt-1" onChange={handleImageUpload('wallpaper')} />
+                        {settings.wallpaper && (
+                            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => onSettingsChange(s => ({...s, wallpaper: null}))}>
+                                <X className="mr-2 h-4 w-4"/> Remove Wallpaper
+                            </Button>
+                        )}
+                    </div>
+                </div>
 
-        </div>
-      </ScrollArea>
-    </>
+                </div>
+            </ScrollArea>
+        </SheetContent>
+    </Sheet>
   );
 }
+
+    
