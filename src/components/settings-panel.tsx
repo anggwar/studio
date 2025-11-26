@@ -77,7 +77,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSettings(s => ({ ...s, [field]: reader.result as string }));
+        setSettings(s => ({ ...s, [field]: reader.result as string, wallpaperType: field === 'wallpaper' ? 'custom' : s.wallpaperType }));
       };
       reader.readAsDataURL(file);
     } else {
@@ -305,17 +305,50 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
           <Separator />
           
           <div>
-            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><ImageIcon className="h-5 w-5"/> Custom Wallpaper</h3>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><ImageIcon className="h-5 w-5"/> Wallpaper</h3>
             <div className="space-y-3">
-                <Label htmlFor="wallpaper-upload" className="block cursor-pointer text-center p-4 border-2 border-dashed rounded-lg hover:bg-accent">
-                    Click to upload a PNG/JPG
-                </Label>
-                <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleImageUpload('wallpaper')} />
-                {settings.wallpaper && (
-                     <Button variant="outline" className="w-full" onClick={() => setSettings(s => ({...s, wallpaper: null}))}>
-                        <X className="mr-2 h-4 w-4"/> Remove Wallpaper
-                    </Button>
-                )}
+               <RadioGroup
+                    value={settings.wallpaperType}
+                    onValueChange={(value: 'default' | 'custom') => {
+                        setSettings(s => ({
+                            ...s, 
+                            wallpaperType: value,
+                            // If switching to custom but no wallpaper is set, trigger upload
+                            ...(value === 'custom' && !s.wallpaper && { wallpaper: '' })
+                        }))
+                        if (value === 'custom' && !settings.wallpaper) {
+                            document.getElementById('wallpaper-upload')?.click();
+                        }
+                    }}
+                    className="grid grid-cols-2 gap-4"
+                >
+                    <div>
+                        <RadioGroupItem value="default" id="default-wallpaper" className="peer sr-only" />
+                        <Label htmlFor="default-wallpaper" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                           Default Landmarks
+                        </Label>
+                    </div>
+                    <div>
+                        <RadioGroupItem value="custom" id="custom-wallpaper" className="peer sr-only" />
+                        <Label htmlFor="custom-wallpaper" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                           Custom Image
+                        </Label>
+                    </div>
+               </RadioGroup>
+
+               {settings.wallpaperType === 'custom' && (
+                 <div className="space-y-3 pt-2">
+                    <Label htmlFor="wallpaper-upload" className="block cursor-pointer text-center p-4 border-2 border-dashed rounded-lg hover:bg-accent">
+                        {settings.wallpaper ? 'Click to change PNG/JPG' : 'Click to upload a PNG/JPG'}
+                    </Label>
+                    <Input id="wallpaper-upload" type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleImageUpload('wallpaper')} />
+                    {settings.wallpaper && (
+                        <Button variant="outline" className="w-full" onClick={() => setSettings(s => ({...s, wallpaper: null, wallpaperType: 'default'}))}>
+                            <X className="mr-2 h-4 w-4"/> Remove & Use Default
+                        </Button>
+                    )}
+                 </div>
+               )}
             </div>
           </div>
 

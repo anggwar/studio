@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import { AppLogo } from "@/components/icons";
 import { getTimezoneInfo, type TimezoneInfo } from '@/lib/timezone-details';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useWallpaper } from '@/hooks/use-wallpaper';
 
 export type SettingsType = {
   locations: string[];
@@ -19,6 +20,7 @@ export type SettingsType = {
   fontClass: string;
   fontColor: string;
   wallpaper: string | null;
+  wallpaperType: 'default' | 'custom';
   fontSize: number;
   title: string;
   stopOnZero: boolean;
@@ -33,6 +35,7 @@ const defaultSettings: SettingsType = {
   fontClass: 'font-headline',
   fontColor: '#D4A274',
   wallpaper: null,
+  wallpaperType: 'default',
   fontSize: 96,
   title: 'Until the New Year',
   stopOnZero: true,
@@ -45,13 +48,20 @@ export default function Home() {
   const [settings, setSettings] = useState<SettingsType>(defaultSettings);
   const [isClient, setIsClient] = useState(false);
   const [timezoneDetails, setTimezoneDetails] = useState<Record<string, TimezoneInfo>>({});
+  
+  const { backgroundStyle } = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
 
   useEffect(() => {
     setIsClient(true);
     try {
       const savedSettings = localStorage.getItem('newYearCountdownSettings');
       if (savedSettings) {
-        setSettings(prevSettings => ({ ...prevSettings, ...JSON.parse(savedSettings) }));
+        const parsedSettings = JSON.parse(savedSettings);
+        // Ensure wallpaperType exists for older saved settings
+        if (!parsedSettings.wallpaperType) {
+          parsedSettings.wallpaperType = parsedSettings.wallpaper ? 'custom' : 'default';
+        }
+        setSettings(prevSettings => ({ ...prevSettings, ...parsedSettings }));
       } else {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (userTimezone && !defaultSettings.locations.includes(userTimezone)) {
@@ -87,10 +97,6 @@ export default function Home() {
   const handleLocationChange = (value: string) => {
     setSettings(s => ({ ...s, currentLocation: value }));
   };
-
-  const backgroundStyle = settings.wallpaper
-    ? { backgroundImage: `url(${settings.wallpaper})` }
-    : {};
   
   if (!isClient) {
     return <div className="fixed inset-0 bg-background" />;
@@ -114,13 +120,13 @@ export default function Home() {
             ) : (
               <AppLogo className="h-8 w-8 text-primary" />
             )}
-            <h1 className={cn("text-xl tracking-wider hidden sm:block", settings.fontClass)}>{settings.companyName}</h1>
+            <h1 className={cn("text-xl tracking-wider hidden sm:block", settings.fontClass)} style={{color: settings.fontColor}}>{settings.companyName}</h1>
           </div>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" className="bg-black/20 p-2 rounded-lg backdrop-blur-sm h-auto">
                 <Settings className="h-7 w-7" />
-                <span className={cn("ml-2 hidden sm:inline", settings.fontClass)}>Settings</span>
+                <span className={cn("ml-2 hidden sm:inline", settings.fontClass)} style={{color: settings.fontColor}}>Settings</span>
                 <span className="sr-only sm:hidden">Settings</span>
               </Button>
             </SheetTrigger>
@@ -186,7 +192,7 @@ export default function Home() {
                                     <span className="truncate hidden sm:inline">{loc.split('/').pop()?.replace('_', ' ')}</span>
                                 </div>
                                 <span className="truncate sm:hidden">{loc.split('/').pop()?.replace('_', ' ')}</span>
-                                <span className="text-[10px]" style={{ opacity: isActive ? 0.7 : 0.5 }}>{info?.gmt}</span>
+                                <span className="text-[10px]" style={{ opacity: isActive ? 0.8 : 0.6 }}>{info?.gmt}</span>
                             </TabsTrigger>
                         )
                     })}
