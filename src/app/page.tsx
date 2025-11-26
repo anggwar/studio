@@ -114,13 +114,13 @@ export default function Home() {
             ) : (
               <AppLogo className="h-8 w-8 text-primary" />
             )}
-            <h1 className="text-xl font-headline tracking-wider hidden sm:block">{settings.companyName}</h1>
+            <h1 className={cn("text-xl tracking-wider hidden sm:block", settings.fontClass)}>{settings.companyName}</h1>
           </div>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" className="bg-black/20 p-2 rounded-lg backdrop-blur-sm h-auto">
                 <Settings className="h-7 w-7" />
-                <span className="ml-2 hidden sm:inline">Settings</span>
+                <span className={cn("ml-2 hidden sm:inline", settings.fontClass)}>Settings</span>
                 <span className="sr-only sm:hidden">Settings</span>
               </Button>
             </SheetTrigger>
