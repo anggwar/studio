@@ -9,6 +9,7 @@ interface CountdownProps {
   fontColor: string;
   fontSize: number;
   title: string;
+  stopOnZero: boolean;
 }
 
 const calculateTimeRemaining = (location: string) => {
@@ -53,18 +54,32 @@ const calculateTimeRemaining = (location: string) => {
 };
 
 
-export function Countdown({ location, fontClassName, fontColor, fontSize, title }: CountdownProps) {
+export function Countdown({ location, fontClassName, fontColor, fontSize, title, stopOnZero }: CountdownProps) {
   const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining(location));
+  const [isNewYear, setIsNewYear] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining(calculateTimeRemaining(location));
-    }, 1000);
+    const checkTime = () => {
+      const remaining = calculateTimeRemaining(location);
+      if (remaining.total <= 0) {
+        setIsNewYear(true);
+        if (!stopOnZero) {
+          setTimeRemaining(remaining);
+        }
+      } else {
+        setIsNewYear(false);
+        setTimeRemaining(remaining);
+      }
+    };
+
+    checkTime(); // Initial check
+
+    const timer = setInterval(checkTime, 1000);
 
     return () => clearInterval(timer);
-  }, [location]);
+  }, [location, stopOnZero]);
 
-  if (timeRemaining.total <= 0) {
+  if (isNewYear && stopOnZero) {
     return (
         <div className={`flex flex-col items-center justify-center ${fontClassName}`} style={{ color: fontColor }}>
             <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter animate-pulse">
@@ -75,11 +90,13 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title 
     );
   }
 
+  const timeToShow = isNewYear ? { days: 0, hours: 0, minutes: 0, seconds: 0 } : timeRemaining;
+
   const timeUnits = [
-    { label: 'Days', value: timeRemaining.days },
-    { label: 'Hours', value: timeRemaining.hours },
-    { label: 'Minutes', value: timeRemaining.minutes },
-    { label: 'Seconds', value: timeRemaining.seconds },
+    { label: 'Days', value: timeToShow.days },
+    { label: 'Hours', value: timeToShow.hours },
+    { label: 'Minutes', value: timeToShow.minutes },
+    { label: 'Seconds', value: timeToShow.seconds },
   ];
 
   return (
@@ -100,6 +117,11 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title 
             </div>
             ))}
         </div>
+        {isNewYear && !stopOnZero && (
+            <div className={`mt-8 text-2xl animate-pulse ${fontClassName}`} style={{ color: fontColor }}>
+                Happy New Year!
+            </div>
+        )}
     </div>
   );
 }

@@ -12,9 +12,10 @@ import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { timezones } from "@/lib/timezones";
-import { Trash2, Palette, Image as ImageIcon, Text, Type } from "lucide-react";
+import { Trash2, Palette, Image as ImageIcon, Text, Type, X, TimerOff } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { Slider } from "./ui/slider";
+import { Switch } from "./ui/switch";
 
 interface SettingsPanelProps {
   settings: SettingsType;
@@ -174,6 +175,24 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                     <Input type="color" value={settings.fontColor} onChange={(e) => setSettings(s => ({...s, fontColor: e.target.value}))} className="h-8 w-10 p-1"/>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><TimerOff className="h-5 w-5"/> Behavior</h3>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                    <Label>Stop timer on New Year</Label>
+                    <p className="text-xs text-muted-foreground">
+                        Show "Happy New Year" instead of counting up.
+                    </p>
+                </div>
+                <Switch
+                    checked={settings.stopOnZero}
+                    onCheckedChange={(checked) => setSettings(s => ({...s, stopOnZero: checked}))}
+                />
             </div>
           </div>
 

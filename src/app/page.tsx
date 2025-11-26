@@ -18,6 +18,7 @@ export type SettingsType = {
   wallpaper: string | null;
   fontSize: number;
   title: string;
+  stopOnZero: boolean;
 };
 
 const defaultSettings: SettingsType = {
@@ -28,6 +29,7 @@ const defaultSettings: SettingsType = {
   wallpaper: null,
   fontSize: 96,
   title: 'Until the New Year',
+  stopOnZero: true,
 };
 
 export default function Home() {
@@ -111,6 +113,7 @@ export default function Home() {
               fontColor={settings.fontColor}
               fontSize={settings.fontSize}
               title={settings.title}
+              stopOnZero={settings.stopOnZero}
             />
         </div>
 
