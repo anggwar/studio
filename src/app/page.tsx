@@ -118,9 +118,10 @@ export default function Home() {
           </div>
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Settings className="h-6 w-6" />
-                <span className="sr-only">Settings</span>
+              <Button variant="ghost" className="bg-black/20 p-2 rounded-lg backdrop-blur-sm h-auto">
+                <Settings className="h-7 w-7" />
+                <span className="ml-2 hidden sm:inline">Settings</span>
+                <span className="sr-only sm:hidden">Settings</span>
               </Button>
             </SheetTrigger>
             <SheetContent className="w-[320px] sm:w-[400px] bg-background/95 backdrop-blur-sm">
