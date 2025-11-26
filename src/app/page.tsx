@@ -171,7 +171,12 @@ export default function Home() {
                     {settings.locations.slice(0, 5).map((loc) => {
                         const info = timezoneDetails[loc];
                         return (
-                            <TabsTrigger key={loc} value={loc} className="flex-col gap-1 py-2 text-xs h-full rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-white">
+                            <TabsTrigger 
+                                key={loc} 
+                                value={loc} 
+                                className="flex-col gap-1 py-2 text-xs h-full rounded-lg data-[state=active]:bg-white/10"
+                                style={{color: settings.fontColor}}
+                            >
                                 <div className="flex items-center gap-2">
                                     {info?.flag && <Image src={info.flag} alt="" width={24} height={18} className="rounded-sm" />}
                                     <span className="truncate hidden sm:inline">{loc.split('/').pop()?.replace('_', ' ')}</span>
