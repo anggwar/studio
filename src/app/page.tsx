@@ -170,19 +170,23 @@ export default function Home() {
                 <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 gap-1">
                     {settings.locations.slice(0, 5).map((loc) => {
                         const info = timezoneDetails[loc];
+                        const isActive = loc === settings.currentLocation;
                         return (
                             <TabsTrigger 
                                 key={loc} 
                                 value={loc} 
                                 className="flex-col gap-1 py-2 text-xs h-full rounded-lg data-[state=active]:bg-white/10"
-                                style={{color: settings.fontColor}}
+                                style={{
+                                    color: settings.fontColor,
+                                    opacity: isActive ? 1 : 0.7
+                                }}
                             >
                                 <div className="flex items-center gap-2">
                                     {info?.flag && <Image src={info.flag} alt="" width={24} height={18} className="rounded-sm" />}
                                     <span className="truncate hidden sm:inline">{loc.split('/').pop()?.replace('_', ' ')}</span>
                                 </div>
                                 <span className="truncate sm:hidden">{loc.split('/').pop()?.replace('_', ' ')}</span>
-                                <span className="text-muted-foreground text-[10px]">{info?.gmt}</span>
+                                <span className="text-[10px]" style={{ opacity: isActive ? 0.7 : 0.5 }}>{info?.gmt}</span>
                             </TabsTrigger>
                         )
                     })}
