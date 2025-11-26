@@ -12,7 +12,6 @@ import { AppLogo } from "@/components/icons";
 import { getTimezoneInfo, type TimezoneInfo } from '@/lib/timezone-details';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useWallpaper } from '@/hooks/use-wallpaper';
 
 export type SettingsType = {
   locations: string[];
@@ -20,7 +19,6 @@ export type SettingsType = {
   fontClass: string;
   fontColor: string;
   wallpaper: string | null;
-  wallpaperType: 'default' | 'custom';
   fontSize: number;
   title: string;
   stopOnZero: boolean;
@@ -35,7 +33,6 @@ const defaultSettings: SettingsType = {
   fontClass: 'font-headline',
   fontColor: '#D4A274',
   wallpaper: null,
-  wallpaperType: 'default',
   fontSize: 96,
   title: 'Until the New Year',
   stopOnZero: true,
@@ -49,19 +46,12 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [timezoneDetails, setTimezoneDetails] = useState<Record<string, TimezoneInfo>>({});
   
-  const backgroundImageStyle = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
-
   useEffect(() => {
     setIsClient(true);
     try {
       const savedSettings = localStorage.getItem('newYearCountdownSettings');
       if (savedSettings) {
-        const parsedSettings = JSON.parse(savedSettings);
-        // Ensure wallpaperType exists for older saved settings
-        if (!parsedSettings.wallpaperType) {
-          parsedSettings.wallpaperType = parsedSettings.wallpaper ? 'custom' : 'default';
-        }
-        setSettings(prevSettings => ({ ...prevSettings, ...parsedSettings }));
+        setSettings(prevSettings => ({ ...prevSettings, ...JSON.parse(savedSettings) }));
       } else {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (userTimezone && !defaultSettings.locations.includes(userTimezone)) {
@@ -107,10 +97,12 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-background overflow-hidden">
-      <div 
-          className="absolute inset-0 transition-all duration-1000 bg-cover bg-center"
-          style={backgroundImageStyle}
-      />
+      {settings.wallpaper && (
+          <div 
+              className="absolute inset-0 transition-all duration-1000 bg-cover bg-center"
+              style={{ backgroundImage: `url(${settings.wallpaper})` }}
+          />
+      )}
       <div className="stars"></div>
       <div className="twinkling"></div>
       <main 
