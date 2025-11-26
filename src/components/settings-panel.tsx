@@ -12,8 +12,9 @@ import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet
 import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { timezones } from "@/lib/timezones";
-import { Trash2, Palette, Image as ImageIcon, Plus, X } from "lucide-react";
+import { Trash2, Palette, Image as ImageIcon, Text, Type } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import { Slider } from "./ui/slider";
 
 interface SettingsPanelProps {
   settings: SettingsType;
@@ -117,6 +118,17 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
           </div>
           
           <Separator />
+          
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Text className="h-5 w-5"/> Title</h3>
+             <Input
+                value={settings.title}
+                onChange={(e) => setSettings(s => ({...s, title: e.target.value}))}
+                placeholder="Countdown Title"
+             />
+          </div>
+
+          <Separator />
 
           <div>
             <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Palette className="h-5 w-5"/> Appearance</h3>
@@ -133,6 +145,20 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                 <div className="flex justify-between items-center">
+                    <Label>Font Size</Label>
+                    <span className="text-sm text-muted-foreground">{settings.fontSize}px</span>
+                 </div>
+                 <Slider
+                    value={[settings.fontSize]}
+                    onValueChange={(value) => setSettings(s => ({ ...s, fontSize: value[0] }))}
+                    min={24}
+                    max={200}
+                    step={1}
+                    className="mt-2"
+                />
               </div>
               <div>
                 <Label>Font Color</Label>
@@ -173,5 +199,3 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
     </>
   );
 }
-
-    

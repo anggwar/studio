@@ -16,6 +16,8 @@ export type SettingsType = {
   fontClass: string;
   fontColor: string;
   wallpaper: string | null;
+  fontSize: number;
+  title: string;
 };
 
 const defaultSettings: SettingsType = {
@@ -24,6 +26,8 @@ const defaultSettings: SettingsType = {
   fontClass: 'font-headline',
   fontColor: '#D4A274',
   wallpaper: null,
+  fontSize: 96,
+  title: 'Until the New Year',
 };
 
 export default function Home() {
@@ -35,7 +39,7 @@ export default function Home() {
     try {
       const savedSettings = localStorage.getItem('newYearCountdownSettings');
       if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
+        setSettings(prevSettings => ({ ...prevSettings, ...JSON.parse(savedSettings) }));
       } else {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (userTimezone && !defaultSettings.locations.includes(userTimezone)) {
@@ -105,6 +109,8 @@ export default function Home() {
               location={settings.currentLocation}
               fontClassName={settings.fontClass}
               fontColor={settings.fontColor}
+              fontSize={settings.fontSize}
+              title={settings.title}
             />
         </div>
 
@@ -124,5 +130,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

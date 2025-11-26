@@ -7,6 +7,8 @@ interface CountdownProps {
   location: string;
   fontClassName: string;
   fontColor: string;
+  fontSize: number;
+  title: string;
 }
 
 const calculateTimeRemaining = (location: string) => {
@@ -51,7 +53,7 @@ const calculateTimeRemaining = (location: string) => {
 };
 
 
-export function Countdown({ location, fontClassName, fontColor }: CountdownProps) {
+export function Countdown({ location, fontClassName, fontColor, fontSize, title }: CountdownProps) {
   const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining(location));
 
   useEffect(() => {
@@ -82,12 +84,13 @@ export function Countdown({ location, fontClassName, fontColor }: CountdownProps
 
   return (
     <div className="flex flex-col items-center">
+        {title && <h2 className="text-2xl sm:text-3xl md:text-4xl font-body mb-4 md:mb-8" style={{ color: fontColor }}>{title}</h2>}
         <div className="flex justify-center gap-2 sm:gap-4 md:gap-8">
             {timeUnits.map((unit) => (
             <div key={unit.label} className="flex flex-col items-center">
                 <div 
-                    className={`text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter ${fontClassName}`}
-                    style={{ color: fontColor }}
+                    className={`font-bold tracking-tighter ${fontClassName}`}
+                    style={{ color: fontColor, fontSize: `${fontSize}px`, lineHeight: 1 }}
                 >
                     {String(unit.value).padStart(2, '0')}
                 </div>
@@ -100,5 +103,3 @@ export function Countdown({ location, fontClassName, fontColor }: CountdownProps
     </div>
   );
 }
-
-    
