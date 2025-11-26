@@ -49,7 +49,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [timezoneDetails, setTimezoneDetails] = useState<Record<string, TimezoneInfo>>({});
   
-  const { backgroundStyle } = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
+  const backgroundImage = useWallpaper(settings.wallpaperType, settings.wallpaper, settings.currentLocation);
 
   useEffect(() => {
     setIsClient(true);
@@ -111,7 +111,7 @@ export default function Home() {
       <div className="twinkling"></div>
       <main 
         className="relative z-10 flex flex-col h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center transition-all duration-500"
-        style={backgroundStyle}
+        style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         <header className="w-full flex justify-between items-start">
           <div className="bg-black/20 p-2 rounded-lg backdrop-blur-sm flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function Home() {
                                     <span className="truncate hidden sm:inline">{loc.split('/').pop()?.replace('_', ' ')}</span>
                                 </div>
                                 <span className="truncate sm:hidden">{loc.split('/').pop()?.replace('_', ' ')}</span>
-                                <span className="text-[10px]" style={{ opacity: isActive ? 0.8 : 0.6 }}>{info?.gmt}</span>
+                                <span className="text-[10px]" style={{ opacity: isActive ? 0.8 : 0.6, color: settings.fontColor }}>{info?.gmt}</span>
                             </TabsTrigger>
                         )
                     })}

@@ -8,27 +8,15 @@ export function useWallpaper(
   wallpaperType: 'default' | 'custom',
   customWallpaperUrl: string | null,
   currentLocation: string
-) {
-  const backgroundStyle = useMemo(() => {
-    let backgroundImage = '';
-
+): string {
+  const backgroundImageUrl = useMemo(() => {
     if (wallpaperType === 'custom' && customWallpaperUrl) {
-      backgroundImage = `url(${customWallpaperUrl})`;
-    } else if (wallpaperType === 'default') {
-      const defaultImageUrl = defaultImages[currentLocation] || defaultImages['default'];
-      backgroundImage = defaultImageUrl ? `url(${defaultImageUrl})` : '';
-    }
+      return customWallpaperUrl;
+    } 
+    
+    return defaultImages[currentLocation] || defaultImages['default'] || '';
 
-    if (!backgroundImage) {
-      return {};
-    }
-
-    return { 
-        backgroundImage,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-    };
   }, [wallpaperType, customWallpaperUrl, currentLocation]);
 
-  return { backgroundStyle };
+  return backgroundImageUrl;
 }
