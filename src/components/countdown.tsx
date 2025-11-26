@@ -82,10 +82,10 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
   if (isNewYear && stopOnZero) {
     return (
         <div className={`flex flex-col items-center justify-center p-4 md:p-8 bg-black/20 rounded-lg backdrop-blur-sm ${fontClassName}`} style={{ color: fontColor }}>
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter animate-pulse">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tighter animate-pulse">
                 Happy New Year!
             </h2>
-            <p className="text-xl sm:text-2xl mt-4 font-body">{location.replace('_', ' ')}</p>
+            <p className="text-lg sm:text-xl mt-2 font-body">{location.replace('_', ' ')}</p>
         </div>
     );
   }
@@ -100,9 +100,9 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
   ];
 
   return (
-    <div className="flex flex-col items-center bg-black/20 p-4 md:p-8 rounded-lg backdrop-blur-sm">
-        {title && <h2 className="text-2xl sm:text-3xl md:text-4xl font-body mb-4 md:mb-8" style={{ color: fontColor }}>{title}</h2>}
-        <div className="flex justify-center gap-2 sm:gap-4 md:gap-8">
+    <div className="flex flex-col items-center bg-black/20 p-4 md:p-6 rounded-lg backdrop-blur-sm w-full">
+        {title && <h2 className="text-xl sm:text-2xl md:text-3xl font-body mb-2 md:mb-4" style={{ color: fontColor }}>{title}</h2>}
+        <div className="flex justify-center gap-2 sm:gap-4">
             {timeUnits.map((unit) => (
             <div key={unit.label} className="flex flex-col items-center">
                 <div 
@@ -111,14 +111,14 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
                 >
                     {String(unit.value).padStart(2, '0')}
                 </div>
-                <div className="text-sm sm:text-base md:text-lg text-foreground/70 font-body uppercase tracking-widest mt-1">
+                <div className="text-xs sm:text-sm text-foreground/70 font-body uppercase tracking-widest mt-1">
                     {unit.label}
                 </div>
             </div>
             ))}
         </div>
         {isNewYear && !stopOnZero && (
-            <div className={`mt-8 text-2xl animate-pulse ${fontClassName}`} style={{ color: fontColor }}>
+            <div className={`mt-4 text-xl animate-pulse ${fontClassName}`} style={{ color: fontColor }}>
                 Happy New Year!
             </div>
         )}

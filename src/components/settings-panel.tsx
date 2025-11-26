@@ -13,12 +13,13 @@ import { useToast } from "@/hooks/use-toast";
 import { fonts } from "@/lib/fonts";
 import { timezones } from "@/lib/timezones";
 import { getTimezoneInfo, type TimezoneInfo } from "@/lib/timezone-details";
-import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2 } from "lucide-react";
+import { Trash2, Palette, Image as ImageIcon, Text, X, TimerOff, Building2, LayoutGrid, Layout } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useMemo } from "react";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import Image from "next/image";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 interface SettingsPanelProps {
   settings: SettingsType;
@@ -133,6 +134,33 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
               </div>
             </div>
           </div>
+
+          <Separator />
+
+          <div>
+             <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Layout className="h-5 w-5"/> Display Mode</h3>
+             <RadioGroup
+                value={settings.displayMode}
+                onValueChange={(value: 'single' | 'multi') => setSettings(s => ({...s, displayMode: value}))}
+                className="grid grid-cols-2 gap-4"
+              >
+                  <div>
+                    <RadioGroupItem value="single" id="single" className="peer sr-only" />
+                    <Label htmlFor="single" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                       <Layout className="mb-3 h-6 w-6" />
+                       Single View
+                    </Label>
+                  </div>
+
+                  <div>
+                    <RadioGroupItem value="multi" id="multi" className="peer sr-only" />
+                    <Label htmlFor="multi" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                      <LayoutGrid className="mb-3 h-6 w-6" />
+                      Multi View
+                    </Label>
+                  </div>
+             </RadioGroup>
+          </div>
           
           <Separator />
           
@@ -195,13 +223,15 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
           
           <Separator />
           
-          <div>
+          <div className={settings.displayMode === 'multi' ? 'opacity-50 pointer-events-none' : ''}>
             <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><Text className="h-5 w-5"/> Title</h3>
              <Input
                 value={settings.title}
                 onChange={(e) => setSettings(s => ({...s, title: e.target.value}))}
                 placeholder="Countdown Title"
+                disabled={settings.displayMode === 'multi'}
              />
+             {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Custom title is disabled in Multi View</p>}
           </div>
 
           <Separator />
@@ -235,6 +265,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                     step={1}
                     className="mt-2"
                 />
+                 {settings.displayMode === 'multi' && <p className="text-xs text-muted-foreground mt-1">Font size is auto-adjusted in Multi View</p>}
               </div>
               <div>
                 <Label>Font Color</Label>

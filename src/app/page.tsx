@@ -11,6 +11,7 @@ import { SettingsPanel } from "@/components/settings-panel";
 import { AppLogo } from "@/components/icons";
 import { getTimezoneInfo, type TimezoneInfo } from '@/lib/timezone-details';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export type SettingsType = {
   locations: string[];
@@ -23,6 +24,7 @@ export type SettingsType = {
   stopOnZero: boolean;
   companyName: string;
   companyLogo: string | null;
+  displayMode: 'single' | 'multi';
 };
 
 const defaultSettings: SettingsType = {
@@ -36,6 +38,7 @@ const defaultSettings: SettingsType = {
   stopOnZero: true,
   companyName: 'Global Countdown',
   companyLogo: null,
+  displayMode: 'single',
 };
 
 export default function Home() {
@@ -93,6 +96,9 @@ export default function Home() {
     return <div className="fixed inset-0 bg-background" />;
   }
 
+  const isMultiView = settings.displayMode === 'multi';
+  const multiViewFontSize = Math.max(24, Math.floor(settings.fontSize / (settings.locations.length > 2 ? 2.5 : 2)));
+
   return (
     <div className="relative min-h-screen w-full bg-background overflow-hidden">
       <div className="stars"></div>
@@ -123,19 +129,41 @@ export default function Home() {
           </Sheet>
         </header>
 
-        <div className="flex-grow flex flex-col items-center justify-center text-center">
-            <Countdown
-              key={settings.currentLocation}
-              location={settings.currentLocation}
-              fontClassName={settings.fontClass}
-              fontColor={settings.fontColor}
-              fontSize={settings.fontSize}
-              title={settings.title}
-              stopOnZero={settings.stopOnZero}
-            />
+        <div className={cn(
+            "flex-grow flex flex-col items-center justify-center text-center",
+            isMultiView && "w-full"
+        )}>
+           {isMultiView ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-7xl mx-auto">
+                    {settings.locations.map(loc => (
+                        <Countdown
+                            key={loc}
+                            location={loc}
+                            fontClassName={settings.fontClass}
+                            fontColor={settings.fontColor}
+                            fontSize={multiViewFontSize}
+                            title={loc.split('/').pop()?.replace('_', ' ') || ''}
+                            stopOnZero={settings.stopOnZero}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <Countdown
+                    key={settings.currentLocation}
+                    location={settings.currentLocation}
+                    fontClassName={settings.fontClass}
+                    fontColor={settings.fontColor}
+                    fontSize={settings.fontSize}
+                    title={settings.title}
+                    stopOnZero={settings.stopOnZero}
+                />
+            )}
         </div>
 
-        <footer className="w-full flex justify-center items-center pt-8">
+        <footer className={cn(
+            "w-full flex justify-center items-center pt-8",
+            isMultiView && "hidden"
+        )}>
             <Tabs value={settings.currentLocation} onValueChange={handleLocationChange} className="w-full max-w-2xl">
                 <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto">
                     {settings.locations.slice(0, 5).map((loc) => {
