@@ -5,11 +5,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Globe } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { SettingsPanel } from "@/components/settings-panel";
 import { AppLogo } from "@/components/icons";
 import { getTimezoneInfo, type TimezoneInfo } from '@/lib/timezone-details';
+import Image from 'next/image';
 
 export type SettingsType = {
   locations: string[];
@@ -25,7 +26,7 @@ export type SettingsType = {
 };
 
 const defaultSettings: SettingsType = {
-  locations: ['America/New_York', 'Europe/London', 'Asia/Tokyo'],
+  locations: ['America/New_York', 'Europe/London', 'Asia/Tokyo', 'Australia/Sydney', 'Asia/Shanghai'],
   currentLocation: 'America/New_York',
   fontClass: 'font-headline',
   fontColor: '#D4A274',
@@ -142,10 +143,10 @@ export default function Home() {
                         return (
                             <TabsTrigger key={loc} value={loc} className="flex-col gap-1 py-2 text-xs h-full">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-lg">{info?.flag}</span>
-                                    <Globe className="h-4 w-4" />
+                                    {info?.flag && <Image src={info.flag} alt="" width={24} height={18} className="rounded-sm" />}
+                                    <span className="truncate hidden sm:inline">{loc.split('/').pop()?.replace('_', ' ')}</span>
                                 </div>
-                                <span className="truncate">{loc.split('/').pop()?.replace('_', ' ')}</span>
+                                <span className="truncate sm:hidden">{loc.split('/').pop()?.replace('_', ' ')}</span>
                                 <span className="text-muted-foreground text-[10px]">{info?.gmt}</span>
                             </TabsTrigger>
                         )

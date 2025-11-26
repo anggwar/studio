@@ -18,6 +18,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useState, useMemo } from "react";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
+import Image from "next/image";
 
 interface SettingsPanelProps {
   settings: SettingsType;
@@ -143,7 +144,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                     return (
                         <div key={loc} className="flex items-center justify-between bg-secondary p-2 rounded-md">
                             <div className="flex items-center gap-2 truncate">
-                                <span className="text-lg">{info.flag}</span>
+                                {info.flag && <Image src={info.flag} alt="" width={20} height={15} className="rounded-sm" />}
                                 <div className="flex flex-col">
                                     <span className="text-sm truncate">{loc.replace('_', ' ')}</span>
                                     <span className="text-xs text-muted-foreground">{info.gmt}</span>
@@ -177,7 +178,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                             return (
                                 <SelectItem key={tz} value={tz}>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-lg">{info.flag}</span>
+                                        {info.flag && <Image src={info.flag} alt="" width={20} height={15} className="rounded-sm" />}
                                         <div className="flex flex-col">
                                             <span>{tz.replace('_', ' ')}</span>
                                             <span className="text-xs text-muted-foreground">{info.gmt}</span>
