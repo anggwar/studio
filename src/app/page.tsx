@@ -107,11 +107,20 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-background overflow-hidden">
+        {backgroundImage && (
+            <Image
+                key={backgroundImage}
+                src={backgroundImage}
+                alt="Background wallpaper"
+                fill
+                priority
+                className="object-cover transition-all duration-500"
+            />
+        )}
       <div className="stars"></div>
       <div className="twinkling"></div>
       <main 
-        className="relative z-10 flex flex-col h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center transition-all duration-500"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        className="relative z-10 flex flex-col h-screen p-4 sm:p-6 md:p-8"
       >
         <header className="w-full flex justify-between items-start">
           <div className="bg-black/20 p-2 rounded-lg backdrop-blur-sm flex items-center gap-2">
