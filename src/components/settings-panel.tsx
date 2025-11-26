@@ -313,9 +313,7 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
                         setSettings(s => ({
                             ...s, 
                             wallpaperType: value,
-                            // If switching to custom but no wallpaper is set, trigger upload
-                            ...(value === 'custom' && !s.wallpaper && { wallpaper: '' })
-                        }))
+                        }));
                         if (value === 'custom' && !settings.wallpaper) {
                             document.getElementById('wallpaper-upload')?.click();
                         }
