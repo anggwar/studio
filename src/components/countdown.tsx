@@ -81,7 +81,7 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
 
   if (isNewYear && stopOnZero) {
     return (
-        <div className={`flex flex-col items-center justify-center ${fontClassName}`} style={{ color: fontColor }}>
+        <div className={`flex flex-col items-center justify-center p-4 md:p-8 bg-black/20 rounded-lg backdrop-blur-sm ${fontClassName}`} style={{ color: fontColor }}>
             <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter animate-pulse">
                 Happy New Year!
             </h2>
@@ -100,7 +100,7 @@ export function Countdown({ location, fontClassName, fontColor, fontSize, title,
   ];
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center bg-black/20 p-4 md:p-8 rounded-lg backdrop-blur-sm">
         {title && <h2 className="text-2xl sm:text-3xl md:text-4xl font-body mb-4 md:mb-8" style={{ color: fontColor }}>{title}</h2>}
         <div className="flex justify-center gap-2 sm:gap-4 md:gap-8">
             {timeUnits.map((unit) => (
