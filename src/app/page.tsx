@@ -101,8 +101,8 @@ export default function Home() {
         className="relative z-10 flex flex-col h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center transition-all duration-500"
         style={backgroundStyle}
       >
-        <header className="w-full flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <header className="w-full flex justify-between items-start">
+          <div className="bg-black/20 p-2 rounded-lg backdrop-blur-sm flex items-center gap-2">
             {settings.companyLogo ? (
               <img src={settings.companyLogo} alt="Company Logo" className="h-8 w-auto" />
             ) : (
